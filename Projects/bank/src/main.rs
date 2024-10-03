@@ -13,14 +13,23 @@ impl Account {
             balance: 0,
         }
     }
-}
 
-fn print_account(account: &Account) {
-    println!("{:#?}", account);
-}
+    fn deposit(&mut self, amount: u32) -> u32 {
+        self.balance += amount;
+        self.balance
+    }
 
-fn change_account(account: &mut Account) {
-    account.balance = 10;
+    fn withdraw(&mut self, amount: u32) -> u32 {
+        self.balance -= amount;
+        self.balance
+    }
+
+    fn summary(&self) -> String {
+        format!(
+            "Account ID: {}, Holder: {}, Balance: {}",
+            self.id, self.holder, self.balance
+        )
+    }
 }
 
 #[derive(Debug)]
@@ -32,20 +41,32 @@ impl Bank {
     fn new() -> Self {
         Bank { accounts: vec![] }
     }
+
+    fn add_account(&mut self, account: Account) {
+        self.accounts.push(account);
+    }
+
+    fn total_balance(&self) -> u32 {
+        self.accounts.iter().map(|account| account.balance).sum()
+    }
+
+    fn summary(&self) -> Vec<String> {
+        self.accounts
+            .iter()
+            .map(|account| account.summary())
+            .collect::<Vec<String>>()
+    }
 }
 
 fn main() {
-    let bank = Bank::new();
-    let mut account: Account = Account::new(1, String::from("Prathamesh"));
+    let mut bank = Bank::new();
+    let mut account: Account = Account::new(10, String::from("Prathamesh"));
 
-    let account_ref = &account;
+    account.deposit(200);
+    account.withdraw(100);
 
-    println!("{:?}", bank);
+    bank.add_account(account);
 
-    print_account(&account);
-
-    change_account(&mut account);
-
-    print!("{:#?}", account);
-    // print!("{:#?}", account_ref);
+    println!("{:#?}", bank.summary());
+    println!("{:#?}", bank.total_balance());
 }
